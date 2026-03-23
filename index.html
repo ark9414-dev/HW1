@@ -11,6 +11,23 @@ body {
   background: linear-gradient(120deg, #ffffff, #f3f3f3);
   font-family: 'Segoe UI', sans-serif;
   display: flex;
+  flex-direction: column;
+}
+
+/* 頂部提示 */
+.header {
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+  background: #c9a227;
+  color: white;
+  font-size: 14px;
+}
+
+/* 主體 */
+.main {
+  display: flex;
+  flex: 1;
 }
 
 /* 左側 */
@@ -23,7 +40,6 @@ body {
 
 .left img {
   width: 75%;
-  object-fit: contain;
 }
 
 /* 右側 */
@@ -38,18 +54,11 @@ body {
 /* 簡介 */
 .bio {
   max-width: 350px;
-}
-
-.bio h2 {
-  margin-bottom: 10px;
-}
-
-.bio p {
-  color: #666;
   line-height: 1.6;
+  color: #555;
 }
 
-/* 專輯卡片 */
+/* 專輯 */
 .albums {
   display: flex;
   gap: 30px;
@@ -71,18 +80,12 @@ body {
   transform: translateY(-10px);
 }
 
-.album-title {
-  text-align: center;
-  margin-top: 8px;
-}
-
 /* 播放器 */
 .player {
   margin-top: 20px;
 }
 
 .song {
-  font-size: 15px;
   margin-bottom: 10px;
 }
 
@@ -125,6 +128,13 @@ body {
 
 <body>
 
+<!-- 頂部提示 -->
+<div class="header">
+  網站當機出現問題，請稍後重新整理，先聽點音樂放放鬆吧
+</div>
+
+<div class="main">
+
 <div class="left">
   <img src="images/hachi.png">
 </div>
@@ -133,23 +143,23 @@ body {
 
   <!-- 簡介 -->
   <div class="bio">
-    <h2>HACHI</h2>
-    <p>
-      A virtual singer with emotional and transparent voice.  
-      A world where music and visuals blend together.
-    </p>
+    她以清澈柔美的嗓音，以及充滿情感的詮釋方式，深深打動了聽眾的心。<br><br>
+    除了在國內外舉辦巡迴演唱會與線上線下音樂活動外，她也固定於 YouTube 上，每週兩次與粉絲分享音樂直播。<br><br>
+    她那直擊人心的純淨歌聲與親切自然的談吐，使她始終與聽眾保持緊密的連結。<br><br>
+    2024 年，她正式簽約 King Records 並正式出道。<br><br>
+    作為一位持續拓展日本、海外及網路平台版圖的新生代藝術家，她正日益受到廣泛關注。
   </div>
 
   <!-- 專輯 -->
   <div class="albums">
     <div class="album" onclick="selectAlbum(0)">
       <img src="images/astra.jpg">
-      <div class="album-title">FOR ASTRA</div>
+      <p>FOR ASTRA</p>
     </div>
 
     <div class="album" onclick="selectAlbum(1)">
       <img src="images/revealia.jpg">
-      <div class="album-title">REVEALIA</div>
+      <p>REVEALIA</p>
     </div>
   </div>
 
@@ -163,11 +173,12 @@ body {
 
     <div class="controls">
       <button class="btn" onclick="prevSong()">⏮</button>
-      <button class="btn" onclick="playSong()">▶</button>
+      <button class="btn" onclick="togglePlay()">⏯</button>
       <button class="btn" onclick="nextSong()">⏭</button>
     </div>
   </div>
 
+</div>
 </div>
 
 <audio id="audio"></audio>
@@ -175,6 +186,7 @@ body {
 <script>
 let currentAlbum = null;
 let currentTrack = 0;
+let isPlaying = false;
 
 const albums = [
   {
@@ -195,12 +207,11 @@ const albums = [
 
 const audio = document.getElementById("audio");
 
-// ⭐ 點擊專輯才播放（解決播放問題）
 function selectAlbum(index) {
   currentAlbum = index;
   currentTrack = 0;
   loadSong();
-  audio.play().catch(() => alert("請點擊播放按鈕"));
+  playSong();
 }
 
 function loadSong() {
@@ -212,8 +223,20 @@ function loadSong() {
 }
 
 function playSong() {
-  if (currentAlbum === null) return alert("請先選擇專輯");
   audio.play();
+  isPlaying = true;
+}
+
+function togglePlay() {
+  if (currentAlbum === null) return alert("請先選擇專輯");
+
+  if (isPlaying) {
+    audio.pause();
+    isPlaying = false;
+  } else {
+    audio.play();
+    isPlaying = true;
+  }
 }
 
 function nextSong() {
@@ -221,7 +244,7 @@ function nextSong() {
   currentTrack++;
   if (currentTrack >= albums[currentAlbum].total) currentTrack = 0;
   loadSong();
-  audio.play();
+  playSong();
 }
 
 function prevSong() {
@@ -229,7 +252,7 @@ function prevSong() {
   currentTrack--;
   if (currentTrack < 0) currentTrack = albums[currentAlbum].total - 1;
   loadSong();
-  audio.play();
+  playSong();
 }
 
 // 進度條

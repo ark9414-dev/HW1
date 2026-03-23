@@ -2,121 +2,228 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>System Waiting</title>
+<title>HACHI Player</title>
 
 <style>
 body {
   margin: 0;
   height: 100vh;
-  background: linear-gradient(135deg, #f5f5f5, #dcdcdc);
-  color: #222;
+  background: linear-gradient(135deg, #f8f8f8, #e6e6e6);
   font-family: 'Segoe UI', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
 }
 
-.container {
+.player {
   text-align: center;
-  position: relative;
+  width: 300px;
 }
 
-h1 {
-  letter-spacing: 6px;
-  font-weight: 300;
-  color: #c9a227;
-  opacity: 0;
-  animation: fadeIn 2s forwards;
+.album-container {
+  overflow: hidden;
+  width: 250px;
+  margin: auto;
 }
 
-p {
-  color: #666;
-  opacity: 0;
-  animation: fadeIn 3s forwards;
+.album-slider {
+  display: flex;
+  transition: transform 0.5s ease;
 }
 
-.loader {
-  margin-top: 25px;
-  border: 3px solid rgba(0,0,0,0.1);
-  border-top: 3px solid #c9a227;
-  border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  animation: spin 1s linear infinite;
-}
-
-.glow-circle {
-  position: absolute;
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, #fff8dc, transparent);
-  border-radius: 50%;
-  filter: blur(80px);
-  animation: pulse 5s infinite;
-  z-index: -1;
-}
-
-/* 音樂按鈕 */
-.music-btn {
-  margin-top: 30px;
-  padding: 10px 20px;
-  border: none;
-  background: #c9a227;
-  color: white;
-  border-radius: 20px;
+.album-img {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin: 0 5px;
   cursor: pointer;
-  transition: 0.3s;
 }
 
-.music-btn:hover {
-  background: #a8891c;
+.controls {
+  margin-top: 15px;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+button {
+  background: #c9a227;
+  border: none;
+  padding: 8px 12px;
+  margin: 5px;
+  color: white;
+  cursor: pointer;
+  border-radius: 10px;
 }
 
-@keyframes fadeIn {
-  to { opacity: 1; }
+/* 進度條 */
+.progress-container {
+  width: 100%;
+  height: 6px;
+  background: #ddd;
+  margin-top: 15px;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
-@keyframes pulse {
-  0%,100% { opacity: 0.3; }
-  50% { opacity: 0.7; }
+.progress {
+  height: 100%;
+  width: 0%;
+  background: #c9a227;
+  border-radius: 5px;
+}
+
+.time {
+  font-size: 12px;
+  color: #555;
 }
 </style>
-
 </head>
+
 <body>
 
-<div class="container">
-  <div class="glow-circle"></div>
-  
-  <h1 id="title">SYSTEM INITIALIZING</h1>
-  <p id="subtitle">Reavilia loading... Please wait</p>
+<div class="player">
 
-  <div class="loader"></div>
+  <!-- 專輯滑動 -->
+  <div class="album-container">
+    <div class="album-slider" id="slider">
+      <img src="images/astra.jpg" class="album-img">
+      <img src="images/revealia.jpg" class="album-img">
+    </div>
+  </div>
 
-  <button class="music-btn" onclick="playMusic()">🎵 Play Music</button>
+  <!-- 控制 -->
+  <div class="controls">
+    <button onclick="prevSong()">⬅️</button>
+    <button onclick="playSong()">▶️</button>
+    <button onclick="nextSong()">➡️</button>
+  </div>
+
+  <!-- 歌名 -->
+  <p id="songName">Song Name</p>
+
+  <!-- 進度條 -->
+  <div class="progress-container" onclick="setProgress(event)">
+    <div class="progress" id="progress"></div>
+  </div>
+
+  <div class="time">
+    <span id="currentTime">0:00</span> /
+    <span id="duration">0:00</span>
+  </div>
+
 </div>
 
-<!-- 音樂 -->
-<audio id="bgm" loop>
-  <source src="music.mp3" type="audio/mpeg">
-</audio>
+<audio id="audio"></audio>
 
 <script>
-function playMusic() {
-  const music = document.getElementById("bgm");
-  music.play();
+let currentAlbumIndex = 0;
+let currentTrack = 0;
+
+const albums = [
+  {
+    name: "FOR ASTRA",
+    total: 12,
+    path: "music/astra/",
+    songs: [
+      "Song 1","Song 2","Song 3","Song 4","Song 5","Song 6",
+      "Song 7","Song 8","Song 9","Song 10","Song 11","Song 12"
+    ]
+  },
+  {
+    name: "REVEALIA",
+    total: 13,
+    path: "music/revealia/",
+    songs: [
+      "Song 1","Song 2","Song 3","Song 4","Song 5","Song 6",
+      "Song 7","Song 8","Song 9","Song 10","Song 11","Song 12","Song 13"
+    ]
+  }
+];
+
+const audio = document.getElementById("audio");
+
+function loadSong() {
+  const album = albums[currentAlbumIndex];
+
+  audio.src = album.path + (currentTrack + 1) + ".mp3";
+
+  document.getElementById("songName").innerText =
+    album.name + " - " + album.songs[currentTrack];
+
+  // 滑動動畫
+  document.getElementById("slider").style.transform =
+    "translateX(" + (-currentAlbumIndex * 260) + "px)";
 }
 
-// 模擬系統狀態變化
-setTimeout(() => {
-  document.getElementById("title").innerText = "CONNECTED";
-  document.getElementById("subtitle").innerText = "Welcome to Reavilia";
-}, 5000);
+function playSong() {
+  audio.play();
+}
+
+function nextSong() {
+  const album = albums[currentAlbumIndex];
+  currentTrack++;
+
+  if (currentTrack >= album.total) currentTrack = 0;
+
+  loadSong();
+  playSong();
+}
+
+function prevSong() {
+  const album = albums[currentAlbumIndex];
+  currentTrack--;
+
+  if (currentTrack < 0) currentTrack = album.total - 1;
+
+  loadSong();
+  playSong();
+}
+
+// ⭐ 滑動切專輯（滑鼠）
+let startX = 0;
+
+document.getElementById("slider").addEventListener("mousedown", e => {
+  startX = e.clientX;
+});
+
+document.getElementById("slider").addEventListener("mouseup", e => {
+  let diff = e.clientX - startX;
+
+  if (diff > 50) currentAlbumIndex = 0;
+  else if (diff < -50) currentAlbumIndex = 1;
+
+  currentTrack = 0;
+  loadSong();
+  playSong();
+});
+
+// ⭐ 進度條更新
+audio.addEventListener("timeupdate", () => {
+  const progress = document.getElementById("progress");
+  const percent = (audio.currentTime / audio.duration) * 100;
+  progress.style.width = percent + "%";
+
+  document.getElementById("currentTime").innerText = formatTime(audio.currentTime);
+  document.getElementById("duration").innerText = formatTime(audio.duration);
+});
+
+// 點擊進度條
+function setProgress(e) {
+  const width = e.currentTarget.clientWidth;
+  const clickX = e.offsetX;
+  audio.currentTime = (clickX / width) * audio.duration;
+}
+
+// 時間格式
+function formatTime(time) {
+  if (isNaN(time)) return "0:00";
+  let m = Math.floor(time / 60);
+  let s = Math.floor(time % 60);
+  if (s < 10) s = "0" + s;
+  return m + ":" + s;
+}
+
+// 初始化
+loadSong();
 </script>
 
 </body>

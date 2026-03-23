@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>System Loading</title>
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle, #1a1a2e, #000);
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.container {
+  text-align: center;
+  position: relative;
+}
+
+h1 {
+  letter-spacing: 4px;
+  font-weight: 300;
+  opacity: 0;
+  animation: fadeIn 2s forwards;
+}
+
+p {
+  opacity: 0;
+  animation: fadeIn 3s forwards;
+}
+
+.loader {
+  margin-top: 20px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top: 3px solid #8a7fff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+.glow-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  background: #8a7fff;
+  border-radius: 50%;
+  filter: blur(120px);
+  animation: pulse 4s infinite;
+  z-index: -1;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%,100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+  <div class="glow-circle"></div>
+  
+  <h1 id="title">SYSTEM RESTARTING</h1>
+  <p id="subtitle">Please wait a moment...</p>
+
+  <div class="loader"></div>
+</div>
+
+<script>
+// 模擬系統恢復
+setTimeout(() => {
+  document.getElementById("title").innerText = "SYSTEM ONLINE";
+  document.getElementById("subtitle").innerText = "Redirecting...";
+}, 5000);
+
+// 自動跳轉（可改網址）
+setTimeout(() => {
+  window.location.href = "https://hachi-official.jp/";
+}, 8000);
+</script>
+
+</body>
+</html>
